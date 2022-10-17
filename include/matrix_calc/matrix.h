@@ -6,38 +6,60 @@ namespace mtx {
     template<size_t M, size_t N = M>
     class matrix{
     public:
-       //matrix();
-       size_t rows = M;
-       size_t cols = N;
+       const size_t rows = M;
+       const size_t cols = N;
 
-       double& operator()(size_t m, size_t n){
-           return buffer[m][n];
-       }
+       double& operator()(size_t m, size_t n);
 
-       matrix<1,N> get_row(size_t n){
-           if (n > M){
-               throw std::out_of_range("out of range");
-           }
-           matrix<1,N> row;
-           for (int i = 0; i < N; ++i){
-               row(0,i) = buffer[n][i];
-           }
-           return row;
-       }
+       matrix<1,N> get_row(size_t n);
 
-       matrix<M, 1> get_col(size_t n){
-           if(n > N){
-               throw std::out_of_range("out of range");
-           }
-           matrix<M, 1> col;
-           for (int i = 0; i < N; ++i){
-               col(i,0) = buffer[i][n];
-           }
-           return col;
-       }
+       matrix<M, 1> get_col(size_t n);
     private:
-        double buffer[M][N];
+        double buffer[M][N]{0};
     };
+
+    template<size_t M, size_t N, size_t K>
+    matrix<M,K> operator*(matrix<M,N> left, matrix<N, K> right);
+
+
+    /*
+     _________________________
+            DEFINITIONS
+     _________________________
+     */
+
+    template<size_t M, size_t N>
+    double &matrix<M, N>::operator()(size_t m, size_t n) {
+        if(m >= M || n >= N ){
+            throw std::out_of_range("out of range");
+        }
+        return buffer[m][n];
+    }
+
+
+    template<size_t M, size_t N>
+    matrix<1,N> matrix<M, N>::get_row(size_t n){
+        if (n > M){
+            throw std::out_of_range("out of range");
+        }
+        matrix<1,N> row;
+        for (int i = 0; i < N; ++i){
+            row(0,i) = buffer[n][i];
+        }
+        return row;
+    }
+
+    template<size_t M, size_t N>
+    matrix<M, 1> matrix<M,N>::get_col(size_t n){
+        if(n >= M){
+            throw std::out_of_range("out of range");
+        }
+        matrix<M, 1> col;
+        for (int i = 0; i < M; ++i){
+            col(i,0) = buffer[i][n];
+        }
+        return col;
+    }
 
     template<size_t M, size_t N, size_t K>
     matrix<M,K> operator*(matrix<M,N> left, matrix<N, K> right){
@@ -55,7 +77,8 @@ namespace mtx {
         return product;
     }
 
-
+    template<size_t M>
+    double determinant(matrix<M, M> matrix){
+        return 0.0;
+    }
 }
-
-

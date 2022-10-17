@@ -39,6 +39,7 @@ int main(){
     std::cout<<std::endl;
 
     auto m5 = m3.get_col(2);
+
     for (int i = 0; i < m5.rows; ++i){
         for(int j = 0; j < m5.cols; ++j){
             std::cout << m5(i, j) << " ";
@@ -47,7 +48,7 @@ int main(){
     }
 
 
-    std::cout<<std::endl;
+    std::cout<< std::endl;
 
     auto m6 = m5*m4;
     for (int i = 0; i < m6.rows; ++i){
@@ -73,8 +74,14 @@ int main(){
         std::cout << std::endl;
     }
 
-
     mtx::matrix<10> a;
+    mtx::determinant(a);
 
+    for (int i = 0; i < a.rows; ++i){
+        for(int j = 0; j < a.cols; ++j){
+            std::cout << a(i, j) << " ";
+        }
+        std::cout << std::endl;
+    }
     return 0;
 }
