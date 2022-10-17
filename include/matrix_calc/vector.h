@@ -1,7 +1,7 @@
 #pragma once
 #include <cstddef>
 
-#include "matrix.h"
+#include "matrix_calc/matrix.h"
 
 namespace mtx {
     template<size_t N>
