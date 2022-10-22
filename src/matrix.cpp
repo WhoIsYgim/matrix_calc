@@ -1,8 +1,334 @@
+#include <stdexcept>
+
 #include "matrix_calc/matrix.h"
+#include "matrix_calc/vector.h"
+#include "matrix_calc/vector/row.h"
+#include "matrix_calc/vector/column.h"
 
 namespace mtx{
 
+    matrix::matrix(std::initializer_list<vector> list)
+    :rows_(list.size()), cols_(list.begin()->size())
+    {
+
+        buffer = new double* [rows_];
+        for(auto i = 0; i < rows_; ++i) {
+            buffer[i] = new double[cols_];
+        }
+
+        std::size_t rw = 0;
+        for(const auto& it: list){
+            if(it.size() != list.begin()->size()){
+                throw std::logic_error("constructing matrix form vectors of different sizes.");
+            }
+            for(auto i = 0; i < cols_; ++i){
+                buffer[rw][i] = it[i];
+            }
+            ++rw;
+        }
+    }
+
+    matrix::matrix(std::initializer_list<column> list)
+    : rows_(list.begin()->size()), cols_(list.size())
+    {
+        buffer = new double* [rows_];
+        for(auto i = 0; i < rows_; ++i) {
+            buffer[i] = new double[cols_];
+        }
+        std::size_t cl = 0;
+        for(const auto& it: list){
+            if(it.size() != list.begin()->size()){
+                throw std::logic_error("constructing matrix form columns of different sizes.");
+            }
+            for(auto i = 0; i < rows_; ++i){
+                buffer[i][cl] = it[i];
+            }
+            ++cl;
+        }
+
+    }
+
+    matrix::matrix(std::initializer_list<row> list)
+    : rows_(list.size()), cols_(list.begin()->size())
+    {
+        buffer = new double* [rows_];
+        for(auto i = 0; i < rows_; ++i) {
+            buffer[i] = new double[cols_];
+        }
+
+        std::size_t rw = 0;
+        for(const auto& it: list){
+            if(it.size() != list.begin()->size()){
+                throw std::logic_error("constructing matrix form rows of different sizes.");
+            }
+            for(auto i = 0; i < cols_; ++i){
+                buffer[rw][i] = it[i];
+            }
+            ++rw;
+        }
+    }
+
+    matrix::matrix(std::size_t m, std::size_t n, double value)
+    : rows_(m), cols_(n)
+    {
+        buffer = new double* [rows_];
+        for(auto i = 0; i < rows_; ++i){
+            buffer[i] = new double[cols_];
+            for(auto j = 0; j < cols_; ++j){
+                buffer[i][j] = value;
+            }
+        }
+    }
+
+    matrix::matrix(const matrix &other)
+    : rows_(other.rows_), cols_(other.cols_)
+    {
+        buffer = new double*[rows_];
+        for(auto i = 0; i < rows_; ++i){
+            buffer[i] = new double[cols_];
+            for(auto j = 0; j < cols_; ++j){
+                buffer[i][j] = other.buffer[i][j];
+            }
+        }
+    }
+
+    matrix::matrix(matrix &&other) noexcept
+    : rows_(other.rows_), cols_(other.cols_), buffer(other.buffer)
+    {
+        other.buffer = nullptr;
+        other.rows_ = 0;
+        other.cols_ = 0;
+    }
+
+    matrix::~matrix(){
+        for(auto i = 0; i < rows_; ++i) {
+            delete[] buffer[i];
+        }
+        delete[] buffer;
+    }
+
+    row matrix::get_row(std::size_t m) {
+        if(m >= rows_){
+            throw std::out_of_range("range_check: m >= this->rows()");
+        }
+        row out(cols_);
+        for(auto i = 0; i < cols_; ++i){
+            out[i] = buffer[m][i];
+        }
+        return out;
+    }
+
+    column matrix::get_col(std::size_t n) {
+        if(n >= cols_){
+            throw std::out_of_range("range_check: n >= this->cols()");
+        }
+        column out(rows_);
+        for (auto i = 0; i < rows_; ++i){
+            out[i] = buffer[i][n];
+        }
+        return out;
+    }
+
+    vector matrix::main_diagonal() {
+        if(rows_ != cols_){
+            throw std::logic_error("extracting a diagonal from a non-square matrix");
+        }
+        vector out(rows_);
+        for(int i = 0; i < rows_; ++i){
+            out[i] = buffer[i][i];
+        }
+        return out;
+    }
+
+    vector matrix::secondary_diagonal() {
+        if(rows_ != cols_){
+            throw std::logic_error("extracting a diagonal from a non-square matrix");
+        }
+        vector out(rows_);
+        for(int i = 0; i < rows_; ++i){
+            out[i] = buffer[rows_ - i][i];
+        }
+        return out;
+    }
+
+    matrix matrix::transposed() {
+        if(rows_ != cols_){
+            throw std::logic_error("transposing a non-square matrix");
+        }
+        //TODO implement
+        return matrix(rows_, cols_);
+    }
+
+    matrix matrix::inverse() {
+        matrix out(cols_, rows_);
+        for(int i = 0; i < rows_; ++i){
+            for(int j = 0; j < cols_; ++j){
+                out[j][i] = buffer[i][j];
+            }
+        }
+        return out;
+    }
+
+    double matrix::determinant() {
+        if(rows_ != cols_){
+            throw std::logic_error("calculating the discriminant of a non-square matrix");
+        }
+        //TODO  implement
+        return 0;
+    }
+
+    double* matrix::operator[](std::size_t m) const{
+        if(m >= rows_){
+            throw std::out_of_range("range_check: m >= this->rows()");
+        }
+        return buffer[m];
+    }
+
+    matrix &matrix::operator=(const matrix &other)= default;
+
+    matrix &matrix::operator=(matrix &&other) noexcept= default;
+
+    matrix &matrix::operator+=(const matrix &rhs) {
+        if((rows_ != rhs.rows_) || (cols_ != rhs.cols_)){
+            throw std::logic_error("addition of matrices of different sizes.");
+        }
+        for(int i = 0; i < rows_; ++i){
+            for(int j = 0; j < cols_; ++j){
+                buffer[i][j] += rhs.buffer[i][j];
+            }
+        }
+        return *this;
+    }
+
+    matrix &matrix::operator*=(const matrix &rhs) {
+        if(cols_ != rhs.rows_){
+            throw std::logic_error("multiplication of incompatible matrices");
+        }
+        matrix temp(*this);
+        realloc(rows_, rhs.cols_);
+        for(auto i = 0; i < rows_; ++i) {
+            for (auto j = 0; i < cols_; ++j) {
+                double cell = 0.0;
+                for (auto k = 0; i < rhs.rows_; ++k) {
+                    cell += temp[i][k] * rhs[k][j];
+                }
+                buffer[i][j] = cell;
+            }
+        }
+        return *this;
+    }
+
+    matrix &matrix::operator*=(double rhs) {
+        for(auto i = 0; i < rows_; ++i){
+            for(auto j = 0; j < cols_; ++j){
+                buffer[i][j]*=rhs;
+            }
+        }
+        return *this;
+    }
+
+    std::size_t matrix::cols() const {
+        return cols_;
+    }
+
+    std::size_t matrix::rows() const {
+        return rows_;
+    }
+
+    void matrix::realloc(std::size_t _rows, std::size_t _cols) {
+        if(rows_ == _rows && cols_ == _cols){
+            return;
+        }
+        for(auto i = 0; i < rows_; ++i) {
+            delete[] buffer[i];
+        }
+        delete[] buffer;
+
+        buffer = new double*[_rows];
+        cols_ = _cols;
+        for(auto i = 0; i < rows_; ++i){
+            buffer[i] = new double [cols_];
+        }
+    }
+
+
+    matrix operator+(const matrix& lhs, const matrix& rhs){
+        if((lhs.rows() != rhs.rows()) || (lhs.cols() != rhs.cols())){
+            throw std::logic_error("addition of matrices of different sizes.");
+        }
+        matrix sum(lhs);
+        sum+=rhs;
+        return sum;
+    }
+    matrix operator*(const matrix& lhs, const matrix& rhs){
+        if(lhs.cols() != rhs.rows()){
+            throw std::logic_error("multiplication of incompatible matrices");
+        }
+        matrix prod(lhs);
+        prod*=rhs;
+        return prod;
+    }
+    matrix operator*(const matrix& lhs, double rhs){
+        matrix prod(lhs);
+        prod*=rhs;
+        return prod;
+    }
+    matrix operator*(double lhs, const matrix& rhs){
+        matrix prod(rhs);
+        prod*=lhs;
+        return prod;
+    }
+
+    column operator*(const matrix& lhs, const column& rhs){
+        if(lhs.cols() != rhs.size()){
+            throw std::logic_error("multiplication of incompatible matrix and column.");
+        }
+        column out(lhs.rows());
+        for(auto i = 0; i < out.size(); ++i){
+            double cell = 0.0;
+            for(int j = 0; j < rhs.size(); ++j){
+                cell += lhs[i][j] * rhs[j];
+            }
+            out[i] = cell;
+        }
+        return out;
+    }
+
+    row operator*(const row& lhs, const matrix& rhs){
+        if(lhs.size() != rhs.rows()){
+            throw std::logic_error("multiplication of incompatible row and matrix.");
+        }
+        row out(rhs.cols());
+        for(auto i = 0; i < out.size(); ++i){
+            double cell = 0.0;
+            for(auto j = 0; j < lhs.size(); ++j){
+                cell += lhs[j] * rhs[j][i];
+            }
+        }
+        return out;
+    }
+
+    matrix operator*(const column& lhs, const row& rhs){
+        if(lhs.size() != rhs.size()){
+            throw std::logic_error("multiplication of incompatible column and row.");
+        }
+        matrix out(lhs.size(), rhs.size());
+        for(auto i = 0; i < out.rows(); ++i){
+            for(auto j = 0; j < out.cols(); ++j){
+                out[i][j] = lhs[i] * rhs[j];
+            }
+        }
+        return out;
+    }
+
+    double operator*(const row& lhs, const column& rhs){
+        if(lhs.size() != rhs.size()){
+            throw std::logic_error("multiplying incompatible row and column.");
+        }
+        double out = 0.0;
+        for(auto i = 0; i < lhs.size(); ++i){
+            out += lhs[i]*rhs[i];
+        }
+        return out;
+    }
 }
-
-
-
