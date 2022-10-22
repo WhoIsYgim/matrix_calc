@@ -41,6 +41,7 @@ namespace mtx {
         std::size_t rows_;
         double** buffer;
 
+
         void realloc(std::size_t _rows, std::size_t _cols);
     };
 

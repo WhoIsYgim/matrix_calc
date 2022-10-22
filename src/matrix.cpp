@@ -1,4 +1,5 @@
 #include <stdexcept>
+#include <cmath>
 
 #include "matrix_calc/matrix.h"
 #include "matrix_calc/vector.h"
@@ -155,8 +156,39 @@ namespace mtx{
         if(rows_ != cols_){
             throw std::logic_error("transposing a non-square matrix");
         }
-        //TODO implement
-        return matrix(rows_, cols_);
+        if(determinant() == 0){
+            throw std::runtime_error("determinant is 0.");
+        }
+        matrix out(rows_, rows_);
+        matrix temp(*this);
+        for(auto i = 0; i < rows_; ++i){
+            out[i][i] = 1.0;
+        }
+
+        for(auto i = 0; i < rows_; ++i){
+            auto pivot = buffer[i][i];
+            for(auto j = 0; j < rows_; ++j){
+                temp[i][j] /= pivot;
+                out[i][j] /= pivot;
+            }
+            for(auto j = i+1; j < rows_; ++j){
+                pivot = temp[j][i];
+                for(auto k = 0; k < rows_; ++k){
+                    temp[j][k] -= temp[i][k] * pivot;
+                    out[j][k] -= out[i][k] * pivot;
+                }
+            }
+        }
+        for (int i = rows_-1; i > 0; --i){
+            for(int j = i - 1; j >= 0; --j){
+                double pivot = temp[j][i];
+                for(auto k = 0; k < rows_; ++k){
+                    temp[j][k] -= temp[i][k] * pivot;
+                    out[j][k] -= out[i][k] *pivot;
+                }
+            }
+        }
+        return out;
     }
 
     matrix matrix::inverse() {
@@ -173,8 +205,38 @@ namespace mtx{
         if(rows_ != cols_){
             throw std::logic_error("calculating the discriminant of a non-square matrix");
         }
-        //TODO  implement
-        return 0;
+        matrix temp(*this);
+
+        double det = 1;
+        for(auto i = 0; i < rows_; ++i){
+            std::size_t pivot_idx = i;
+            double pivot = buffer[i][i];
+            for(auto j = i+1; j < rows_; ++j){
+                if(std::abs(temp[j][i]) > pivot){
+                    pivot = std::abs(temp[j][i]);
+                    pivot_idx = j;
+                }
+            }
+            if(pivot == 0){
+                return 0;
+            }
+            if(pivot_idx != i){
+                std::swap(temp.buffer[pivot_idx], temp.buffer[i]);
+                det *= -1;
+            }
+            for(auto j = i+1; j < rows_; ++j){
+                if(temp[j][i] != 0){
+                    double factor = temp[j][i]/ temp[i][i] ;
+                    for(auto k = i; k < rows_; ++k){
+                        temp[j][k] -= temp[i][k] * factor;
+                    }
+                }
+            }
+        }
+        for(int i = 0; i < rows_; ++i) {
+            det *= temp[i][i];
+        }
+        return det;
     }
 
     double* matrix::operator[](std::size_t m) const{
@@ -207,9 +269,9 @@ namespace mtx{
         matrix temp(*this);
         realloc(rows_, rhs.cols_);
         for(auto i = 0; i < rows_; ++i) {
-            for (auto j = 0; i < cols_; ++j) {
+            for (auto j = 0; j < cols_; ++j) {
                 double cell = 0.0;
-                for (auto k = 0; i < rhs.rows_; ++k) {
+                for (auto k = 0; k < rhs.rows_; ++k) {
                     cell += temp[i][k] * rhs[k][j];
                 }
                 buffer[i][j] = cell;

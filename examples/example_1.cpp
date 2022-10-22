@@ -64,8 +64,27 @@ int main(){
 
     std::cout << std::endl;
 
+    mtx::row r1{1,2,3};
+    mtx::row r2{4,5,6};
+    mtx::row r3{7,8,11};
 
-    mtx::row r_1{1,2,3,4};
+    mtx::matrix mx{r1, r2, r3};
+    auto mw = mx.transposed();
+    for(int i = 0; i < mw.rows(); ++i){
+        for(int j = 0; j < mw.cols(); ++j){
+            std::cout << mw[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
+
+    std::cout << std::endl;
+    mtx::matrix mt_2 = mx*mw;
+    for(int i = 0; i < mt_2.rows(); ++i){
+        for(int j = 0; j < mt_2.cols(); ++j){
+            std::cout << mt_2[i][j] << " ";
+        }
+        std::cout << std::endl;
+    }
 
     return 0;
 }
