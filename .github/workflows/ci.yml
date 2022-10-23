@@ -34,7 +34,7 @@ jobs:
           name: build
   
       - run: ls -la
-      
+      - run : chmod +x ./test_matrix_lib
       - name: run tests
         run: cd scripts && bash tests.sh
         
