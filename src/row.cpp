@@ -20,7 +20,7 @@ namespace mtx{
 
     row row::reverse() {
         row out(size_);
-        for(auto i = 0; i < size_; ++i){
+        for(size_t  i = 0; i < size_; ++i){
             out[i] = buffer[size_-1-i];
         }
         return out;
@@ -28,7 +28,7 @@ namespace mtx{
 
     column row::inverse() {
         column out(size_);
-        for(auto i = 0; i < size_; ++i){
+        for(size_t  i = 0; i < size_; ++i){
             out[i] = buffer[i];
         }
         return out;
@@ -38,7 +38,7 @@ namespace mtx{
         if(size_ != rhs.size_){
             throw std::logic_error("adding rows of different sizes.");
         }
-        for(auto i =0; i < size_; ++i){
+        for(size_t  i =0; i < size_; ++i){
             buffer[i] += rhs[i];
         }
         return *this;

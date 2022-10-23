@@ -9,11 +9,11 @@
 namespace mtx{
 
     matrix::matrix(std::initializer_list<vector> list)
-    :rows_(list.size()), cols_(list.begin()->size())
+    :cols_(list.begin()->size()), rows_(list.size())
     {
 
         buffer = new double* [rows_];
-        for(auto i = 0; i < rows_; ++i) {
+        for(size_t  i = 0; i < rows_; ++i) {
             buffer[i] = new double[cols_];
         }
 
@@ -22,7 +22,7 @@ namespace mtx{
             if(it.size() != list.begin()->size()){
                 throw std::logic_error("constructing matrix form vectors of different sizes.");
             }
-            for(auto i = 0; i < cols_; ++i){
+            for(size_t  i = 0; i < cols_; ++i){
                 buffer[rw][i] = it[i];
             }
             ++rw;
@@ -30,10 +30,10 @@ namespace mtx{
     }
 
     matrix::matrix(std::initializer_list<column> list)
-    : rows_(list.begin()->size()), cols_(list.size())
+    : cols_(list.size()), rows_(list.begin()->size())
     {
         buffer = new double* [rows_];
-        for(auto i = 0; i < rows_; ++i) {
+        for(size_t  i = 0; i < rows_; ++i) {
             buffer[i] = new double[cols_];
         }
         std::size_t cl = 0;
@@ -41,19 +41,18 @@ namespace mtx{
             if(it.size() != list.begin()->size()){
                 throw std::logic_error("constructing matrix form columns of different sizes.");
             }
-            for(auto i = 0; i < rows_; ++i){
+            for(size_t  i = 0; i < rows_; ++i){
                 buffer[i][cl] = it[i];
             }
             ++cl;
         }
-
     }
 
     matrix::matrix(std::initializer_list<row> list)
-    : rows_(list.size()), cols_(list.begin()->size())
+    : cols_(list.begin()->size()), rows_(list.size())
     {
         buffer = new double* [rows_];
-        for(auto i = 0; i < rows_; ++i) {
+        for(size_t  i = 0; i < rows_; ++i) {
             buffer[i] = new double[cols_];
         }
 
@@ -62,7 +61,7 @@ namespace mtx{
             if(it.size() != list.begin()->size()){
                 throw std::logic_error("constructing matrix form rows of different sizes.");
             }
-            for(auto i = 0; i < cols_; ++i){
+            for(size_t  i = 0; i < cols_; ++i){
                 buffer[rw][i] = it[i];
             }
             ++rw;
@@ -70,31 +69,31 @@ namespace mtx{
     }
 
     matrix::matrix(std::size_t m, std::size_t n, double value)
-    : rows_(m), cols_(n)
+    : cols_(n), rows_(m)
     {
         buffer = new double* [rows_];
-        for(auto i = 0; i < rows_; ++i){
+        for(size_t  i = 0; i < rows_; ++i){
             buffer[i] = new double[cols_];
-            for(auto j = 0; j < cols_; ++j){
+            for(size_t  j = 0; j < cols_; ++j){
                 buffer[i][j] = value;
             }
         }
     }
 
     matrix::matrix(const matrix &other)
-    : rows_(other.rows_), cols_(other.cols_)
+    : cols_(other.cols_), rows_(other.rows_)
     {
         buffer = new double*[rows_];
-        for(auto i = 0; i < rows_; ++i){
+        for(size_t i = 0; i < rows_; ++i){
             buffer[i] = new double[cols_];
-            for(auto j = 0; j < cols_; ++j){
+            for(size_t  j = 0; j < cols_; ++j){
                 buffer[i][j] = other.buffer[i][j];
             }
         }
     }
 
     matrix::matrix(matrix &&other) noexcept
-    : rows_(other.rows_), cols_(other.cols_), buffer(other.buffer)
+    : cols_(other.cols_), rows_(other.rows_), buffer(other.buffer)
     {
         other.buffer = nullptr;
         other.rows_ = 0;
@@ -102,7 +101,7 @@ namespace mtx{
     }
 
     matrix::~matrix(){
-        for(auto i = 0; i < rows_; ++i) {
+        for(size_t  i = 0; i < rows_; ++i) {
             delete[] buffer[i];
         }
         delete[] buffer;
@@ -113,7 +112,7 @@ namespace mtx{
             throw std::out_of_range("range_check: m >= this->rows()");
         }
         row out(cols_);
-        for(auto i = 0; i < cols_; ++i){
+        for(size_t  i = 0; i < cols_; ++i){
             out[i] = buffer[m][i];
         }
         return out;
@@ -124,7 +123,7 @@ namespace mtx{
             throw std::out_of_range("range_check: n >= this->cols()");
         }
         column out(rows_);
-        for (auto i = 0; i < rows_; ++i){
+        for (size_t  i = 0; i < rows_; ++i){
             out[i] = buffer[i][n];
         }
         return out;
@@ -135,7 +134,7 @@ namespace mtx{
             throw std::logic_error("extracting a diagonal from a non-square matrix");
         }
         vector out(rows_);
-        for(int i = 0; i < rows_; ++i){
+        for(size_t  i = 0; i < rows_; ++i){
             out[i] = buffer[i][i];
         }
         return out;
@@ -146,7 +145,7 @@ namespace mtx{
             throw std::logic_error("extracting a diagonal from a non-square matrix");
         }
         vector out(rows_);
-        for(int i = 0; i < rows_; ++i){
+        for(size_t  i = 0; i < rows_; ++i){
             out[i] = buffer[rows_ - i][i];
         }
         return out;
@@ -163,10 +162,10 @@ namespace mtx{
         matrix temp(*this);
         double norm_cols = 0;
         double norm_rows = 0;
-        for(auto i = 0; i < rows_; ++i){
+        for(size_t  i = 0; i < rows_; ++i){
             double row = 0;
             double col = 0;
-            for(auto j = 0; j < rows_; ++j){
+            for(size_t  j = 0; j < rows_; ++j){
                 row += std::abs(temp[i][j]);
                 col += std::abs(temp[j][i]);
             }
@@ -177,7 +176,7 @@ namespace mtx{
         temp *= (1/(norm_rows*norm_cols));
 
         matrix E(rows_,rows_);
-        for(auto i = 0; i < rows_; ++i){
+        for(size_t  i = 0; i < rows_; ++i){
             E[i][i] = 2;
         }
 
@@ -196,8 +195,8 @@ namespace mtx{
 
     matrix matrix::transposed() {
         matrix out(cols_, rows_);
-        for(int i = 0; i < rows_; ++i){
-            for(int j = 0; j < cols_; ++j){
+        for(size_t  i = 0; i < rows_; ++i){
+            for(size_t  j = 0; j < cols_; ++j){
                 out[j][i] = buffer[i][j];
             }
         }
@@ -211,10 +210,10 @@ namespace mtx{
         matrix temp(*this);
 
         double det = 1;
-        for(auto i = 0; i < rows_; ++i){
+        for(size_t  i = 0; i < rows_; ++i){
             std::size_t pivot_idx = i;
             double pivot = buffer[i][i];
-            for(auto j = i+1; j < rows_; ++j){
+            for(size_t  j = i+1; j < rows_; ++j){
                 if(std::abs(temp[j][i]) > pivot){
                     pivot = std::abs(temp[j][i]);
                     pivot_idx = j;
@@ -227,16 +226,16 @@ namespace mtx{
                 std::swap(temp.buffer[pivot_idx], temp.buffer[i]);
                 det *= -1;
             }
-            for(auto j = i+1; j < rows_; ++j){
+            for(size_t  j = i+1; j < rows_; ++j){
                 if(temp[j][i] != 0){
                     double factor = temp[j][i]/ temp[i][i] ;
-                    for(auto k = i; k < rows_; ++k){
+                    for(size_t  k = i; k < rows_; ++k){
                         temp[j][k] -= temp[i][k] * factor;
                     }
                 }
             }
         }
-        for(int i = 0; i < rows_; ++i) {
+        for(size_t  i = 0; i < rows_; ++i) {
             det *= temp[i][i];
         }
         return det;
@@ -254,8 +253,8 @@ namespace mtx{
             return *this;
         }
         realloc(other.rows_, other.cols_);
-        for(auto i = 0; i < rows_; ++i){
-            for(auto j = 0; j < cols_; ++j){
+        for(size_t  i = 0; i < rows_; ++i){
+            for(size_t  j = 0; j < cols_; ++j){
                 buffer[i][j] = other[i][j];
             }
         }
@@ -265,7 +264,7 @@ namespace mtx{
         if(&other == this){
             return *this;
         }
-        for(auto i = 0; i < rows_; ++i){
+        for(size_t  i = 0; i < rows_; ++i){
             delete[] buffer[i];
         }
         delete[] buffer;
@@ -279,14 +278,14 @@ namespace mtx{
         other.cols_ = 0;
 
         return *this;
-    };
+    }
 
     matrix &matrix::operator+=(const matrix &rhs) {
         if((rows_ != rhs.rows_) || (cols_ != rhs.cols_)){
             throw std::logic_error("addition of matrices of different sizes.");
         }
-        for(int i = 0; i < rows_; ++i){
-            for(int j = 0; j < cols_; ++j){
+        for(size_t  i = 0; i < rows_; ++i){
+            for(size_t  j = 0; j < cols_; ++j){
                 buffer[i][j] += rhs.buffer[i][j];
             }
         }
@@ -299,10 +298,10 @@ namespace mtx{
         }
         matrix temp(*this);
         realloc(rows_, rhs.cols_);
-        for(auto i = 0; i < rows_; ++i) {
-            for (auto j = 0; j < cols_; ++j) {
+        for(size_t i = 0; i < rows_; ++i) {
+            for (size_t  j = 0; j < cols_; ++j) {
                 double cell = 0.0;
-                for (auto k = 0; k < rhs.rows_; ++k) {
+                for (size_t  k = 0; k < rhs.rows_; ++k) {
                     cell += temp[i][k] * rhs[k][j];
                 }
                 buffer[i][j] = cell;
@@ -312,8 +311,8 @@ namespace mtx{
     }
 
     matrix &matrix::operator*=(double rhs) {
-        for(auto i = 0; i < rows_; ++i){
-            for(auto j = 0; j < cols_; ++j){
+        for(size_t  i = 0; i < rows_; ++i){
+            for(size_t  j = 0; j < cols_; ++j){
                 buffer[i][j]*=rhs;
             }
         }
@@ -332,7 +331,7 @@ namespace mtx{
         if(rows_ == _rows && cols_ == _cols){
             return;
         }
-        for(auto i = 0; i < rows_; ++i) {
+        for(size_t  i = 0; i < rows_; ++i) {
             delete[] buffer[i];
         }
         delete[] buffer;
@@ -340,7 +339,7 @@ namespace mtx{
         rows_ = _rows;
         buffer = new double*[rows_];
         cols_ = _cols;
-        for(auto i = 0; i < rows_; ++i){
+        for(size_t  i = 0; i < rows_; ++i){
             buffer[i] = new double [cols_];
         }
     }
@@ -378,9 +377,9 @@ namespace mtx{
             throw std::logic_error("multiplication of incompatible matrix and column.");
         }
         column out(lhs.rows());
-        for(auto i = 0; i < out.size(); ++i){
+        for(size_t  i = 0; i < out.size(); ++i){
             double cell = 0.0;
-            for(int j = 0; j < rhs.size(); ++j){
+            for(size_t  j = 0; j < rhs.size(); ++j){
                 cell += lhs[i][j] * rhs[j];
             }
             out[i] = cell;
@@ -393,11 +392,12 @@ namespace mtx{
             throw std::logic_error("multiplication of incompatible row and matrix.");
         }
         row out(rhs.cols());
-        for(auto i = 0; i < out.size(); ++i){
+        for(size_t  i = 0; i < out.size(); ++i){
             double cell = 0.0;
-            for(auto j = 0; j < lhs.size(); ++j){
+            for(size_t  j = 0; j < lhs.size(); ++j){
                 cell += lhs[j] * rhs[j][i];
             }
+            out[i] = cell;
         }
         return out;
     }
@@ -407,8 +407,8 @@ namespace mtx{
             throw std::logic_error("multiplication of incompatible column and row.");
         }
         matrix out(lhs.size(), rhs.size());
-        for(auto i = 0; i < out.rows(); ++i){
-            for(auto j = 0; j < out.cols(); ++j){
+        for(size_t  i = 0; i < out.rows(); ++i){
+            for(size_t  j = 0; j < out.cols(); ++j){
                 out[i][j] = lhs[i] * rhs[j];
             }
         }
@@ -420,7 +420,7 @@ namespace mtx{
             throw std::logic_error("multiplying incompatible row and column.");
         }
         double out = 0.0;
-        for(auto i = 0; i < lhs.size(); ++i){
+        for(size_t  i = 0; i < lhs.size(); ++i){
             out += lhs[i]*rhs[i];
         }
         return out;

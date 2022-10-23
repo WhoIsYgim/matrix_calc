@@ -19,7 +19,7 @@ namespace mtx{
 
     vector vector::reverse() {
         vector out(size_);
-        for(auto i = 0; i < size_; ++i){
+        for(size_t  i = 0; i < size_; ++i){
             out[i] = buffer[size_-1-i];
         }
         return out;
@@ -29,7 +29,7 @@ namespace mtx{
         if(size_ != rhs.size_){
             throw std::logic_error("adding vectors of different sizes.");
         }
-        for(auto i =0; i < size_; ++i){
+        for(size_t  i =0; i < size_; ++i){
             buffer[i] += rhs[i];
         }
         return *this;
@@ -76,7 +76,7 @@ namespace mtx{
     :  size_(n)
     {
         buffer = new double[size_];
-        for(auto i = 0; i < size_; ++i){
+        for(size_t  i = 0; i < size_; ++i){
             buffer[i] = value;
         }
     }
@@ -85,7 +85,7 @@ namespace mtx{
     : size_(other.size_)
     {
         buffer = new double[size_];
-        for (auto i = 0; i < size_; ++i){
+        for (size_t  i = 0; i < size_; ++i){
             buffer[i] = other.buffer[i];
         }
     }
@@ -118,7 +118,7 @@ namespace mtx{
 
 
     IVector &IVector::operator*=(double rhs) {
-        for(auto i = 0; i < size_; ++i){
+        for(size_t  i = 0; i < size_; ++i){
             buffer[i] *=rhs;
         }
         return *this;
