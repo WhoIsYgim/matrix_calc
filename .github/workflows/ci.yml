@@ -31,8 +31,9 @@ jobs:
         with:
           name: build
   
- 
+      - run: ls -la
+      
       - name: run tests
-        run: cd test/ && ./test_matrix 
+        run: cd test/ && ./test_matrix_lib 
         
         
