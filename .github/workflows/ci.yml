@@ -30,9 +30,9 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build
-      
-      - run: ls -la
+  
+ 
       - name: run tests
-        run: cd build/test/ && ./test_matrix 
+        run: cd test/ && ./test_matrix 
         
         
