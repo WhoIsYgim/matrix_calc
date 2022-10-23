@@ -37,6 +37,4 @@ jobs:
     
       - name: run tests
         run: cd scripts && chmod +x tests.sh && bash tests.sh
-      
-        
-        
+
