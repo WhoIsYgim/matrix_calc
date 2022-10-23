@@ -36,6 +36,7 @@ jobs:
       - run: ls -la
     
       - name: run tests
-        run: cd scripts && bash tests.sh
+        run: cd scripts && chmod +x tests.sh && bash run_tests.sh
+      
         
         
