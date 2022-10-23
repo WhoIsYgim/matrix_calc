@@ -16,6 +16,8 @@ jobs:
         run:  sudo apt-get install libgtest-dev
       - name: build project
         run: cd scripts/ && bash build.sh
+        
+      - run: ls -la 
       
       - name: upload build
         uses: actions/upload-artifact@v3
