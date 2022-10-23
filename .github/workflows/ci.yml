@@ -15,13 +15,13 @@ jobs:
       - name: install dependencies 
         run:  sudo apt-get install libgtest-dev
       - name: build project
-        run: cmake -B build && cd build/ && cmake --build .
+        run: cd scripts/ && bash build.sh
       
       - name: upload build
         uses: actions/upload-artifact@v3
         with:
             name: build
-            path: build/
+            path: matrix_calc/
   test:
     runs-on: ubuntu-latest
     needs: build
@@ -34,6 +34,6 @@ jobs:
       - run: ls -la
       
       - name: run tests
-        run: cd test/ && ./test_matrix_lib 
+        run: cd scripts && bash tests.sh
         
         
