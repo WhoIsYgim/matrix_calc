@@ -146,7 +146,7 @@ namespace mtx{
         }
         vector out(rows_);
         for(size_t  i = 0; i < rows_; ++i){
-            out[i] = buffer[rows_ - i][i];
+            out[i] = buffer[rows_ - i-1][i];
         }
         return out;
     }

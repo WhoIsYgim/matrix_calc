@@ -39,17 +39,6 @@ namespace mtx {
     vector operator*(const vector& lhs, double rhs);
     vector operator*(double lhs, const vector& rhs);
 
-
-
-
-//    template<size_t N>
-//    class vector_comp : vector{
-//        vector_comp() : vector(N){
-//
-//        }
-//    private:
-//        //matrix_comp<1,N> buffer;
-//    };
 }
 
 

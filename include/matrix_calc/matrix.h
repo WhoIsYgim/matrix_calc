@@ -125,10 +125,10 @@ namespace mtx {
     template<size_t M, size_t N, size_t K>
     matrix_ct<M,K> operator*(matrix_ct<M,N> left, matrix_ct<N, K> right){
         matrix_ct<M,K> out;
-        for(auto i = 0; i < M; ++i) {
-            for (auto j = 0; j < K; ++j) {
+        for(size_t i = 0; i < M; ++i) {
+            for (size_t j = 0; j < K; ++j) {
                 double cell = 0.0;
-                for (auto k = 0; k < N; ++k) {
+                for (size_t k = 0; k < N; ++k) {
                     cell += left[i][k] * right[k][j];
                 }
                 out[i][j] = cell;
@@ -140,8 +140,8 @@ namespace mtx {
     template<size_t M, size_t N>
     matrix_ct<M,N> operator+(matrix_ct<M,N> left, matrix_ct<M,N> right){
         matrix_ct<M,N> out;
-        for(auto i = 0; i < M; ++i) {
-            for (auto j = 0; j < N; ++j) {
+        for(size_t i = 0; i < M; ++i) {
+            for (size_t j = 0; j < N; ++j) {
                 out[i][j] = left[i][j] + right[i][j];
             }
         }
