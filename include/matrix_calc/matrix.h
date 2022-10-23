@@ -55,92 +55,107 @@ namespace mtx {
     row    operator*(const row& lhs, const matrix& rhs);
     double operator*(const row& lhs, const column& rhs);
 
-
+    /*
+      ________________________________
+      COMPILE-TIME MATRIX DECLARATION
+      ________________________________
+     */
 
     template<size_t M, size_t N = M>
-    class matrix_comp{
+    class matrix_ct{
     public:
-       size_t rows(){
-         return M;
-       }
-       size_t cols(){
-           return N;
-       }
+        matrix_ct(double value = 0);
+        matrix_ct(const matrix_ct<M, N>& other);
 
-       double& operator()(size_t m, size_t n);
+        double* operator[](std::size_t m) const;
+        matrix_ct& operator= (const matrix_ct& other);
+        matrix_ct& operator+=(const matrix_ct& rhs);
+        matrix_ct& operator*=(double rhs);
 
-       double* operator[](const size_t& m){
-           return buffer[m];
-       }
+        size_t rows();
+        size_t cols();
 
-       matrix_comp<1,N> get_row(size_t n);
-
-       matrix_comp<M, 1> get_col(size_t n);
     private:
-        double buffer[M][N]{0};
+        matrix buffer;
     };
 
-    template<size_t M, size_t N, size_t K>
-    matrix_comp<M,K> operator*(matrix_comp<M,N> left, matrix_comp<N, K> right);
-
-
     /*
-     _________________________
-            DEFINITIONS
-     _________________________
+     _________________________________________________________
+            DEFINITIONS for Compile-time matrix's methods
+     _________________________________________________________
      */
 
     template<size_t M, size_t N>
-    double &matrix_comp<M, N>::operator()(size_t m, size_t n) {
-        if(m >= M || n >= N ){
-            throw std::out_of_range("out of range");
-        }
-        return buffer[m][n];
-    }
+    matrix_ct<M, N>::matrix_ct(double value)
+    :buffer(M, N, value)
+    {}
+
+    template<size_t M, size_t N>
+    matrix_ct<M, N>::matrix_ct(const matrix_ct<M, N> &other)
+    :buffer(other.buffer)
+    {}
 
 
     template<size_t M, size_t N>
-    matrix_comp<1,N> matrix_comp<M, N>::get_row(size_t n){
-        if (n > M){
-            throw std::out_of_range("out of range");
-        }
-        matrix_comp<1,N> row;
-        for (int i = 0; i < N; ++i){
-            row(0,i) = buffer[n][i];
-        }
-        return row;
+    double *matrix_ct<M, N>::operator[](std::size_t m) const {
+        return buffer[m];
     }
 
     template<size_t M, size_t N>
-    matrix_comp<M, 1> matrix_comp<M,N>::get_col(size_t n){
-        if(n >= M){
-            throw std::out_of_range("out of range");
+    matrix_ct<M,N> &matrix_ct<M, N>::operator=(const matrix_ct<M,N> &other) {
+        if(&other == this){
+            return *this;
         }
-        matrix_comp<M, 1> col;
-        for (int i = 0; i < M; ++i){
-            col(i,0) = buffer[i][n];
-        }
-        return col;
+        buffer = other.buffer;
+        return *this;
+    }
+
+    template<size_t M, size_t N>
+    matrix_ct<M,N> &matrix_ct<M, N>::operator+=(const matrix_ct<M,N> &rhs) {
+        buffer += rhs.buffer;
+        return *this;
+    }
+
+    template<size_t M, size_t N>
+    matrix_ct<M, N> &matrix_ct<M, N>::operator*=(double rhs) {
+        buffer *= rhs;
+        return *this;
     }
 
     template<size_t M, size_t N, size_t K>
-    matrix_comp<M,K> operator*(matrix_comp<M,N> left, matrix_comp<N, K> right){
-        matrix_comp<M, K> product;
-        for(int i = 0; i < M; ++i){
-            for(int j = 0; j < K; ++j){
-                double cur_cell_value = 0;
-                for (int k = 0; k < N; ++k){
-                    cur_cell_value += left(i,k) * right(k,j);
+    matrix_ct<M,K> operator*(matrix_ct<M,N> left, matrix_ct<N, K> right){
+        matrix_ct<M,K> out;
+        for(auto i = 0; i < M; ++i) {
+            for (auto j = 0; j < K; ++j) {
+                double cell = 0.0;
+                for (auto k = 0; k < N; ++k) {
+                    cell += left[i][k] * right[k][j];
                 }
-                product(i,j) = cur_cell_value;
+                out[i][j] = cell;
             }
         }
-
-        return product;
+        return out;
     }
 
-    template<size_t M>
-    double determinant(matrix_comp<M, M> matrix){
-        return 0.0;
+    template<size_t M, size_t N>
+    matrix_ct<M,N> operator+(matrix_ct<M,N> left, matrix_ct<M,N> right){
+        matrix_ct<M,N> out;
+        for(auto i = 0; i < M; ++i) {
+            for (auto j = 0; j < N; ++j) {
+                out[i][j] = left[i][j] + right[i][j];
+            }
+        }
+        return out;
     }
+
+    template<size_t M, size_t N>
+    size_t matrix_ct<M, N>::rows() {
+        return M;
+    }
+
+    template<size_t M, size_t N>
+    size_t matrix_ct<M, N>::cols() {
+        return N;
+    }
+
 }

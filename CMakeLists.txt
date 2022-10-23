@@ -5,12 +5,12 @@ option(BUILD_EXAMPLE_1 "Build executable example #1." ON)
 
 file(GLOB SOURCES "src/*.cpp")
 
-add_library(${PROJECT_NAME} ${SOURCES})
-target_include_directories(${PROJECT_NAME} PUBLIC include)
+add_library(${PROJECT_NAME}_lib ${SOURCES})
+target_include_directories(${PROJECT_NAME}_lib PUBLIC include)
 
 if (BUILD_EXAMPLE_1)
     add_executable(example_1 examples/example_1.cpp)
-    target_link_libraries(example_1 ${PROJECT_NAME})
+    target_link_libraries(example_1 ${PROJECT_NAME}_lib)
 endif ()
 
 add_subdirectory(test)

@@ -1,7 +1,9 @@
-project(test)
+project(test_matrix_lib)
 find_package(GTest REQUIRED)
 
-add_executable(${PROJECT_NAME} Test.cpp)
+file(GLOB TEST_SOURCES "*.cpp")
 
-target_link_libraries(${PROJECT_NAME} PUBLIC GTest::gtest)
-target_link_libraries(${PROJECT_NAME} PUBLIC matrix_calculator)
+add_executable(${PROJECT_NAME} ${TEST_SOURCES})
+
+target_link_libraries(${PROJECT_NAME} PUBLIC GTest::gtest_main)
+target_link_libraries(${PROJECT_NAME} PUBLIC matrix_calculator_lib)

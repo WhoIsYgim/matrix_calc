@@ -152,46 +152,49 @@ namespace mtx{
         return out;
     }
 
-    matrix matrix::transposed() {
+    matrix matrix::inverse() {
         if(rows_ != cols_){
             throw std::logic_error("transposing a non-square matrix");
         }
         if(determinant() == 0){
             throw std::runtime_error("determinant is 0.");
         }
-        matrix out(rows_, rows_);
+
         matrix temp(*this);
+        double norm_cols = 0;
+        double norm_rows = 0;
         for(auto i = 0; i < rows_; ++i){
-            out[i][i] = 1.0;
+            double row = 0;
+            double col = 0;
+            for(auto j = 0; j < rows_; ++j){
+                row += std::abs(temp[i][j]);
+                col += std::abs(temp[j][i]);
+            }
+            norm_cols = std::max(col, norm_cols);
+            norm_rows = std::max(row, norm_rows);
+        }
+        temp = temp.transposed();
+        temp *= (1/(norm_rows*norm_cols));
+
+        matrix E(rows_,rows_);
+        for(auto i = 0; i < rows_; ++i){
+            E[i][i] = 2;
         }
 
-        for(auto i = 0; i < rows_; ++i){
-            auto pivot = buffer[i][i];
-            for(auto j = 0; j < rows_; ++j){
-                temp[i][j] /= pivot;
-                out[i][j] /= pivot;
-            }
-            for(auto j = i+1; j < rows_; ++j){
-                pivot = temp[j][i];
-                for(auto k = 0; k < rows_; ++k){
-                    temp[j][k] -= temp[i][k] * pivot;
-                    out[j][k] -= out[i][k] * pivot;
-                }
-            }
-        }
-        for (int i = rows_-1; i > 0; --i){
-            for(int j = i - 1; j >= 0; --j){
-                double pivot = temp[j][i];
-                for(auto k = 0; k < rows_; ++k){
-                    temp[j][k] -= temp[i][k] * pivot;
-                    out[j][k] -= out[i][k] *pivot;
-                }
-            }
+        matrix out(temp);
+        double eps = 1.0e-15;
+        while (std::abs(
+                (*this*out).determinant() -1 ) >= eps){
+            matrix prev (out);
+            out = *this*prev;
+            out *= -1;
+            out += E;
+            out = prev*out;
         }
         return out;
     }
 
-    matrix matrix::inverse() {
+    matrix matrix::transposed() {
         matrix out(cols_, rows_);
         for(int i = 0; i < rows_; ++i){
             for(int j = 0; j < cols_; ++j){
@@ -246,9 +249,37 @@ namespace mtx{
         return buffer[m];
     }
 
-    matrix &matrix::operator=(const matrix &other)= default;
+    matrix &matrix::operator=(const matrix &other) {
+        if(&other == this){
+            return *this;
+        }
+        realloc(other.rows_, other.cols_);
+        for(auto i = 0; i < rows_; ++i){
+            for(auto j = 0; j < cols_; ++j){
+                buffer[i][j] = other[i][j];
+            }
+        }
+        return *this;
+    }
+    matrix &matrix::operator=(matrix &&other) noexcept {
+        if(&other == this){
+            return *this;
+        }
+        for(auto i = 0; i < rows_; ++i){
+            delete[] buffer[i];
+        }
+        delete[] buffer;
 
-    matrix &matrix::operator=(matrix &&other) noexcept= default;
+        buffer = other.buffer;
+        rows_ = other.rows_;
+        cols_ = other.cols_;
+
+        other.buffer = nullptr;
+        other.rows_ = 0;
+        other.cols_ = 0;
+
+        return *this;
+    };
 
     matrix &matrix::operator+=(const matrix &rhs) {
         if((rows_ != rhs.rows_) || (cols_ != rhs.cols_)){
@@ -306,7 +337,8 @@ namespace mtx{
         }
         delete[] buffer;
 
-        buffer = new double*[_rows];
+        rows_ = _rows;
+        buffer = new double*[rows_];
         cols_ = _cols;
         for(auto i = 0; i < rows_; ++i){
             buffer[i] = new double [cols_];
