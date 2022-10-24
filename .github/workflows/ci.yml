@@ -36,5 +36,5 @@ jobs:
       - run: ls -la
     
       - name: run tests
-        run: chmod +x ./build/test/test_matrix_lib
+        run: chmod +x ./build/test/test_matrix_lib && ./build/test/test_matrix_lib
 
