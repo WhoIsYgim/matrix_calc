@@ -13,14 +13,20 @@ namespace mtx {
         IVector(IVector&& other) noexcept;
         virtual ~IVector();
 
+        void append(double rhs);
+
         double& at(std::size_t n);
         double& operator[](size_t n) const;
+        IVector& operator+=(double rhs);
         IVector& operator*=(double rhs);
 
         std::size_t size() const;
     protected:
         std::size_t size_;
+        std::size_t capacity;
         double *buffer;
+
+        void realloc();
     };
 
     class vector: public IVector{

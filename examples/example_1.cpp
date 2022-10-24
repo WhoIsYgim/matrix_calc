@@ -2,14 +2,15 @@
 
 int main(){
 
-    mtx::matrix_ct<2,3> m1(3);
-    mtx::matrix_ct<3,2> m2(4);
-    auto m3 = m1*m2;
-    for(size_t i = 0; i < m3.rows(); ++i){
-        for(size_t j = 0; j < m3.cols(); ++j){
-            std::cout << m3[i][j] << " ";
-        }
-        std::cout << std::endl;
+
+    mtx::vector v{1,2,3};
+    v.append(4);
+
+    mtx::row r{2};
+    r.append(4);
+
+    for(size_t i = 0; i < r.size(); ++i){
+       std::cout << r[i] << " ";
     }
 
 

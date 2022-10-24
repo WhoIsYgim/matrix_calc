@@ -254,3 +254,102 @@ TEST_F(TestMatrix, inverse){
 
     EXPECT_THROW(m23.inverse(), std::logic_error);
 }
+
+TEST_F(TestMatrix, plus_equals){
+    mtx::matrix target(m33);
+    target+=m33;
+    for(size_t i = 0; i < target.rows(); ++i){
+        for(size_t j = 0; j < target.cols(); ++j){
+            EXPECT_DOUBLE_EQ(target[i][j], 2*m33[i][j]);
+        }
+    }
+    EXPECT_THROW(target+=m23, std::logic_error);
+}
+
+TEST_F(TestMatrix, muilt_equals_matrix){
+    mtx::matrix target(m23);
+    target*=m32;
+
+    EXPECT_EQ(target.rows(), 2);
+    EXPECT_EQ(target.cols(), 2);
+
+    EXPECT_DOUBLE_EQ(target[0][0], 5);
+    EXPECT_DOUBLE_EQ(target[0][1], 8);
+    EXPECT_DOUBLE_EQ(target[1][0], 8);
+    EXPECT_DOUBLE_EQ(target[1][1], 14);
+
+    EXPECT_THROW(m32*=m33, std::logic_error);
+}
+
+TEST_F(TestMatrix, muilt_equals_double){
+    mtx::matrix target(m23);
+    target*=1.5;
+    for(size_t i = 0; i < target.rows(); ++i){
+        for(size_t j = 0; j < target.cols(); ++j){
+            EXPECT_DOUBLE_EQ(target[i][j], 1.5*m23[i][j]);
+        }
+    }
+}
+
+TEST_F(TestMatrix, append_row){
+    mtx::row r3{3, 4, 5};
+    m33.append(r3);
+
+    EXPECT_EQ(m33.rows(), 4);
+    EXPECT_EQ(m33.cols(), 3);
+
+    EXPECT_DOUBLE_EQ(m33[3][0], r3[0]);
+    EXPECT_DOUBLE_EQ(m33[3][1], r3[1]);
+    EXPECT_DOUBLE_EQ(m33[3][2], r3[2]);
+
+    EXPECT_THROW(m33.append(mtx::row(4)), std::logic_error);
+}
+
+TEST_F(TestMatrix, append_column){
+    mtx::column c3{3, 4, 5};
+    m33.append(c3);
+
+    EXPECT_EQ(m33.rows(), 3);
+    EXPECT_EQ(m33.cols(), 4);
+
+    EXPECT_DOUBLE_EQ(m33[0][3], c3[0]);
+    EXPECT_DOUBLE_EQ(m33[1][3], c3[1]);
+    EXPECT_DOUBLE_EQ(m33[2][3], c3[2]);
+
+    EXPECT_THROW(m33.append(mtx::column(4)), std::logic_error);
+}
+
+class TestCtMatrix : public ::testing::Test {
+protected:
+    mtx::matrix_ct<3,3> m33;
+
+    void SetUp() override{
+        for(size_t i = 0; i < m33.rows(); ++i){
+            for(size_t j = 0; j < m33.cols(); ++j){
+                m33[i][j] = double(i+j);
+            }
+        }
+    }
+
+    void TearDown() override {
+
+    }
+};
+
+TEST_F(TestCtMatrix, vaule_constr){
+    for(size_t i = 0; i < m33.rows(); ++i){
+        EXPECT_DOUBLE_EQ(m33[i][i], 0);
+    }
+    mtx::matrix_ct<3,3> m33_test(10);
+
+    for(size_t i = 0; i < m33_test.rows(); ++i){
+        EXPECT_DOUBLE_EQ(m33_test[i][i], 10);
+    }
+}
+
+TEST_F(TestCtMatrix, copy_constr){
+    auto target(m33);
+    for(size_t i = 0; i < target.rows(); ++i){
+        EXPECT_DOUBLE_EQ(target[i][i], m33[i][i]);
+    }
+}

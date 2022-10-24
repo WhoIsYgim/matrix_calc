@@ -62,7 +62,7 @@ namespace mtx{
      */
 
     IVector::IVector(std::initializer_list<double> list)
-    : size_(list.size())
+    : size_(list.size()), capacity(size_)
     {
         buffer = new double[size_];
         std::size_t i = 0;
@@ -73,7 +73,7 @@ namespace mtx{
     }
 
     IVector::IVector(std::size_t n, double value)
-    :  size_(n)
+    :  size_(n), capacity(size_)
     {
         buffer = new double[size_];
         for(size_t  i = 0; i < size_; ++i){
@@ -82,7 +82,7 @@ namespace mtx{
     }
 
     IVector::IVector(const IVector &other)
-    : size_(other.size_)
+    : size_(other.size_), capacity(size_)
     {
         buffer = new double[size_];
         for (size_t  i = 0; i < size_; ++i){
@@ -91,14 +91,22 @@ namespace mtx{
     }
 
     IVector::IVector(IVector &&other) noexcept
-    : size_(other.size_), buffer(other.buffer)
+    : size_(other.size_), capacity(size_), buffer(other.buffer)
     {
         other.size_ = 0;
+        other.capacity = 0;
         other.buffer = nullptr;
     }
 
     IVector::~IVector() {
         delete[] buffer;
+    }
+
+    void IVector::append(double rhs) {
+     if(size_+1 > capacity){
+         realloc();
+     }
+        buffer[size_++] = rhs;
     }
 
     double &IVector::at(std::size_t n) {
@@ -123,5 +131,16 @@ namespace mtx{
         }
         return *this;
     }
+
+    void IVector::realloc() {
+        double* temp = buffer;
+        capacity *= 2;
+        buffer = new double [capacity];
+        for(size_t i = 0; i < size_; ++i){
+            buffer[i] = temp[i];
+        }
+        delete[] temp;
+    }
+
 }
 

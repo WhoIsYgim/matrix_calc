@@ -9,7 +9,8 @@
 namespace mtx{
 
     matrix::matrix(std::initializer_list<vector> list)
-    :cols_(list.begin()->size()), rows_(list.size())
+    :cols_(list.begin()->size()), rows_(list.size()),
+    cols_cap(cols_), rows_cap(rows_)
     {
 
         buffer = new double* [rows_];
@@ -30,7 +31,8 @@ namespace mtx{
     }
 
     matrix::matrix(std::initializer_list<column> list)
-    : cols_(list.size()), rows_(list.begin()->size())
+    : cols_(list.size()), rows_(list.begin()->size()),
+      cols_cap(cols_), rows_cap(rows_)
     {
         buffer = new double* [rows_];
         for(size_t  i = 0; i < rows_; ++i) {
@@ -49,7 +51,8 @@ namespace mtx{
     }
 
     matrix::matrix(std::initializer_list<row> list)
-    : cols_(list.begin()->size()), rows_(list.size())
+    : cols_(list.begin()->size()), rows_(list.size()),
+      cols_cap(cols_), rows_cap(rows_)
     {
         buffer = new double* [rows_];
         for(size_t  i = 0; i < rows_; ++i) {
@@ -69,7 +72,8 @@ namespace mtx{
     }
 
     matrix::matrix(std::size_t m, std::size_t n, double value)
-    : cols_(n), rows_(m)
+    : cols_(n), rows_(m),
+      cols_cap(cols_), rows_cap(rows_)
     {
         buffer = new double* [rows_];
         for(size_t  i = 0; i < rows_; ++i){
@@ -81,7 +85,8 @@ namespace mtx{
     }
 
     matrix::matrix(const matrix &other)
-    : cols_(other.cols_), rows_(other.rows_)
+    : cols_(other.cols_), rows_(other.rows_),
+      cols_cap(cols_), rows_cap(rows_)
     {
         buffer = new double*[rows_];
         for(size_t i = 0; i < rows_; ++i){
@@ -93,15 +98,18 @@ namespace mtx{
     }
 
     matrix::matrix(matrix &&other) noexcept
-    : cols_(other.cols_), rows_(other.rows_), buffer(other.buffer)
+    : cols_(other.cols_), rows_(other.rows_),
+    cols_cap(cols_), rows_cap(rows_), buffer(other.buffer)
     {
         other.buffer = nullptr;
         other.rows_ = 0;
         other.cols_ = 0;
+        other.rows_cap = 0;
+        other.cols_cap = 0;
     }
 
     matrix::~matrix(){
-        for(size_t  i = 0; i < rows_; ++i) {
+        for(size_t  i = 0; i < rows_cap; ++i) {
             delete[] buffer[i];
         }
         delete[] buffer;
@@ -241,6 +249,32 @@ namespace mtx{
         return det;
     }
 
+    void matrix::append(const row &rhs) {
+        if(cols_ != rhs.size()){
+            throw std::logic_error("appending an incompatible row.");
+        }
+        if(rows_+1 > rows_cap){
+            realloc(2*rows_, cols_);
+        }
+        for(size_t i = 0; i < cols_; ++i){
+            buffer[rows_][i] = rhs[i];
+        }
+        ++rows_;
+    }
+
+    void matrix::append(const column &rhs) {
+        if(rows_ != rhs.size()){
+            throw std::logic_error("appending an incompatible column.");
+        }
+        if(cols_+1 > cols_cap){
+            realloc(rows_, 2*cols_);
+        }
+        for(size_t i = 0; i < rows_; ++i){
+            buffer[i][cols_] = rhs[i];
+        }
+        ++cols_;
+    }
+
     double* matrix::operator[](std::size_t m) const{
         if(m >= rows_){
             throw std::out_of_range("range_check: m >= this->rows()");
@@ -276,6 +310,8 @@ namespace mtx{
         other.buffer = nullptr;
         other.rows_ = 0;
         other.cols_ = 0;
+        other.rows_cap = 0;
+        other.cols_cap = 0;
 
         return *this;
     }
@@ -298,6 +334,7 @@ namespace mtx{
         }
         matrix temp(*this);
         realloc(rows_, rhs.cols_);
+        cols_ = rhs.cols_;
         for(size_t i = 0; i < rows_; ++i) {
             for (size_t  j = 0; j < cols_; ++j) {
                 double cell = 0.0;
@@ -331,19 +368,26 @@ namespace mtx{
         if(rows_ == _rows && cols_ == _cols){
             return;
         }
+        auto** temp = new double * [_rows];
+        for (size_t i = 0; i < _rows; ++i){
+            temp[i] = new double [_cols];
+        }
+        for(size_t i = 0; i < rows_; ++i){
+            for(size_t j = 0; j < cols_; ++j){
+                temp[i][j] = buffer[i][j];
+            }
+        }
+
         for(size_t  i = 0; i < rows_; ++i) {
             delete[] buffer[i];
         }
         delete[] buffer;
 
-        rows_ = _rows;
-        buffer = new double*[rows_];
-        cols_ = _cols;
-        for(size_t  i = 0; i < rows_; ++i){
-            buffer[i] = new double [cols_];
-        }
-    }
+        buffer = temp;
 
+        rows_cap = _rows;
+        cols_cap = _cols;
+    }
 
     matrix operator+(const matrix& lhs, const matrix& rhs){
         if((lhs.rows() != rhs.rows()) || (lhs.cols() != rhs.cols())){

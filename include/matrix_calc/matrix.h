@@ -26,6 +26,8 @@ namespace mtx {
         matrix transposed();
         matrix inverse();
         double determinant();
+        void append(const row& rhs);
+        void append(const column& rhs);
 
         double* operator[](std::size_t m) const;
         matrix& operator= (const matrix& other);
@@ -39,6 +41,8 @@ namespace mtx {
     private:
         std::size_t cols_;
         std::size_t rows_;
+        std::size_t cols_cap;
+        std::size_t rows_cap;
         double** buffer;
 
 
