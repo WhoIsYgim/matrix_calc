@@ -13,7 +13,7 @@ jobs:
       - uses: actions/checkout@v2
       
       - name: install dependencies 
-        run:  sudo apt-get install libgtest-dev
+        run:  sudo apt-get install libgtest-dev lcov
       - name: build project
         run: cd scripts/ && bash build.sh
         
@@ -36,5 +36,5 @@ jobs:
       - run: ls -la
     
       - name: run tests
-        run: cd scripts && chmod +x tests.sh && bash tests.sh
+        run: chmod +x ./build/test/test_matrix_lib
 
