@@ -337,8 +337,9 @@ protected:
 };
 
 TEST_F(TestCtMatrix, vaule_constr){
-    for(size_t i = 0; i < m33.rows(); ++i){
-        EXPECT_DOUBLE_EQ(m33[i][i], 0);
+    mtx::matrix_ct<3,3> m0(0);
+    for(size_t i = 0; i < m0.rows(); ++i){
+        EXPECT_DOUBLE_EQ(m0[i][i], 0);
     }
     mtx::matrix_ct<3,3> m33_test(10);
 

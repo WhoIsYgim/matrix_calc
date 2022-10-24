@@ -16,7 +16,7 @@ namespace mtx{
     column::column(const column &other) = default;
 
     column::column(column &&other) noexcept
-    : IVector(other)
+    : IVector(std::move(other))
     {}
 
     column column::reverse() {

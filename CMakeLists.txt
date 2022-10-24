@@ -4,7 +4,7 @@ project(matrix_calculator LANGUAGES CXX)
 include(CTest)
 find_package(GTest REQUIRED)
 
-option(BUILD_EXAMPLE_1 "Build executable example #1." ON)
+option(BUILD_EXAMPLE_1 "Build executable example #1." OFF)
 
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wpedantic -Werror -Wall -Wextra")

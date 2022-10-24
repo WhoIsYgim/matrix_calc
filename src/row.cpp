@@ -15,7 +15,7 @@ namespace mtx{
     row::row(const row &other) = default;
 
     row::row(row &&other) noexcept
-    : IVector(other)
+    : IVector(std::move(other))
     {}
 
     row row::reverse() {

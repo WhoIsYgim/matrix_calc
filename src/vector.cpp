@@ -14,7 +14,7 @@ namespace mtx{
     vector::vector(const vector &other) = default;
 
     vector::vector(vector &&other) noexcept
-    : IVector(other)
+    : IVector(std::move(other))
     {}
 
     vector vector::reverse() {
