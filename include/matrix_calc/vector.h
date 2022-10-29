@@ -46,5 +46,3 @@ namespace mtx {
     vector operator*(double lhs, const vector& rhs);
 
 }
-
-
