@@ -44,10 +44,13 @@ jobs:
         run : chmod +x ./build/test/test_matrix_lib && ./build/test/test_matrix_lib
 
       - name: generate coverage info
-        run : lcov -t "build/test/test_matrix_lib" -o coverage.info -c -d .
+        run : lcov -t "build/test/test_matrix_lib" -o coverage.info -c -d  build/CMakeFiles/matrix_calculator.dir/src/
+
+      - name: filter coverage
+        run : lcov --remove coverage.info '/usr/*' -o coverage_filtered.info
 
       - name: generate report
-        run : genhtml -o report coverage.info
+        run : genhtml -o report coverage_filtered.info
 
       - name: upload report
         uses: actions/download-artifact@v3
