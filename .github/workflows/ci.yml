@@ -49,4 +49,3 @@ jobs:
     
       - name: run tests
         run: chmod +x ./test_matrix_lib && ./test_matrix_lib
-
