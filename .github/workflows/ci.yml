@@ -19,22 +19,34 @@ jobs:
         
       - run: ls -la 
       
-      - name: upload build
+      - name: upload lib
         uses: actions/upload-artifact@v3
         with:
-            name: build
-            path: .
+            name: libmatrix_calculator
+            path: ./build/libmatrix_calculator.a
+            
+      - name: upload tests
+        uses: actions/upload-artifact@v3
+        with:
+            name: test_matrix_lib
+            path: ./build/test/test_matrix_lib
+            
   test:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: download build
+      - name: download libmatrix_calculator
         uses: actions/download-artifact@v3
         with:
-          name: build
+          name: libmatrix_calculator
+          
+      - name: download test_matrix_lib
+        uses: actions/download-artifact@v3
+        with:
+          name: test_matrix_lib
   
       - run: ls -la
     
       - name: run tests
-        run: chmod +x ./build/test/test_matrix_lib && ./build/test/test_matrix_lib
+        run: chmod +x ./test_matrix_lib && ./test_matrix_lib
 
