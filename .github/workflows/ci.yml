@@ -38,7 +38,7 @@ jobs:
       - run : ls -la
 
       - name: install lcov
-        run : sudo apt-get update && apt-get -y install lcov
+        run : sudo apt update && apt install lcov
 
       - name: run tests
         run : chmod +x ./test/test_matrix_lib && ./test/test_matrix_lib
