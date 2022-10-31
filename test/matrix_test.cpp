@@ -260,15 +260,15 @@ TEST_F(TestMatrix, inverse){
     EXPECT_THROW(m23.inverse(), std::logic_error);
 
     auto target_2 = m33.inverse(0.001);
-    EXPECT_DOUBLE_EQ(target[0][0], -1.75);
-    EXPECT_DOUBLE_EQ(target[0][1],  0.5);
-    EXPECT_DOUBLE_EQ(target[0][2],  0.25);
-    EXPECT_DOUBLE_EQ(target[1][0],  0.5);
-    EXPECT_DOUBLE_EQ(target[1][1],  1.0);
-    EXPECT_DOUBLE_EQ(target[1][2], -0.5);
-    EXPECT_DOUBLE_EQ(target[2][0],  0.25);
-    EXPECT_DOUBLE_EQ(target[2][1], -0.5);
-    EXPECT_DOUBLE_EQ(target[2][2],  0.25);
+    EXPECT_TRUE(target_2[0][0] + 1.75 < 0.001);
+    EXPECT_TRUE(target_2[0][1] - 0.5  < 0.001);
+    EXPECT_TRUE(target_2[0][2] - 0.25 < 0.001);
+    EXPECT_TRUE(target_2[1][0] - 0.5  < 0.001);
+    EXPECT_TRUE(target_2[1][1] - 1.0  < 0.001);
+    EXPECT_TRUE(target_2[1][2] + 0.5  < 0.001);
+    EXPECT_TRUE(target_2[2][0] - 0.25 < 0.001);
+    EXPECT_TRUE(target_2[2][1] + 0.5  < 0.001);
+    EXPECT_TRUE(target_2[2][2] - 0.25 < 0.001);
 }
 
 TEST_F(TestMatrix, plus_equals){
