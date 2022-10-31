@@ -167,36 +167,35 @@ namespace mtx{
             throw std::runtime_error("determinant is 0.");
         }
 
-        matrix temp(*this);
+        //inverse matrix is calculated with iteration expression
+        //A_{k}^{-1} = A_{k-1}^{-1}(2E-A A_{k}^{-1})
+
+        matrix out(*this);
         double norm_cols = 0;
         double norm_rows = 0;
         for(size_t  i = 0; i < rows_; ++i){
             double row = 0;
             double col = 0;
             for(size_t  j = 0; j < rows_; ++j){
-                row += std::abs(temp[i][j]);
-                col += std::abs(temp[j][i]);
+                row += std::abs(out[i][j]);
+                col += std::abs(out[j][i]);
             }
             norm_cols = std::max(col, norm_cols);
             norm_rows = std::max(row, norm_rows);
         }
-        temp = temp.transposed();
-        temp *= (1/(norm_rows*norm_cols));
+        out = out.transposed();
+        out *= (1 / (norm_rows * norm_cols));
 
         matrix E(rows_,rows_);
         for(size_t  i = 0; i < rows_; ++i){
             E[i][i] = 2;
         }
 
-        matrix out(temp);
         double eps = 1.0e-15;
-        while (std::abs(
-                (*this*out).determinant() -1 ) >= eps){
+        while (std::abs((*this * out).determinant() - 1 ) >= eps){
             matrix prev (out);
-            out = *this*prev;
-            out *= -1;
-            out += E;
-            out = prev*out;
+            out = *this * prev * (-1) + E;
+            out = prev * out;
         }
         return out;
     }
