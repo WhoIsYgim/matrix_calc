@@ -19,33 +19,35 @@ jobs:
         
       - run: ls -la 
       
-      - name: upload lib
+      - name: upload build
         uses: actions/upload-artifact@v3
         with:
-            name: libmatrix_calculator
-            path: ./build/libmatrix_calculator.a
-            
-      - name: upload tests
-        uses: actions/upload-artifact@v3
-        with:
-            name: test_matrix_lib
-            path: ./build/test/test_matrix_lib
+            name: build
+            path: ./build
+
             
   test:
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: download libmatrix_calculator
+      - name: download build
         uses: actions/download-artifact@v3
         with:
-          name: libmatrix_calculator
-          
-      - name: download test_matrix_lib
-        uses: actions/download-artifact@v3
-        with:
-          name: test_matrix_lib
-  
-      - run: ls -la
+          name: build
+
+      - run : ls -la
     
       - name: run tests
-        run: chmod +x ./test_matrix_lib && ./test_matrix_lib
+        run : chmod +x ./test/test_matrix_lib && ./test/test_matrix_lib
+
+      - name: generate coverage info
+        run : lcov -t "test/test_matrix_lib" -o coverage.info -c -d .
+
+      - name: generate report
+        run : genhtml -o report coverage.info
+
+      - name: upload report
+        uses: actions/download-artifact@v3
+        with:
+          name: report
+          path: ./report
