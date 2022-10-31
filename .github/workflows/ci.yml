@@ -55,5 +55,5 @@ jobs:
       - name: upload report
         uses: actions/download-artifact@v3
         with:
-          name: report
+          name: coverage_report
           path: ./report
