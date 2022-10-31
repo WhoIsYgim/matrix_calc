@@ -53,6 +53,10 @@ TEST_F(TestMatrix, size_value_const){
     for(size_t i = 0; i < m22_def.rows(); ++i){
         EXPECT_DOUBLE_EQ(m22_def[i][i], 0);
     }
+
+    mtx::matrix m0(0,0);
+    EXPECT_EQ(m0.rows(), 0);
+    EXPECT_EQ(m0.cols(), 0);
 }
 
 TEST_F(TestMatrix, vector_list_constr){
@@ -303,6 +307,9 @@ TEST_F(TestMatrix, append_row){
     EXPECT_DOUBLE_EQ(m33[3][2], r3[2]);
 
     EXPECT_THROW(m33.append(mtx::row(4)), std::logic_error);
+
+    mtx::matrix m0(0,0);
+    EXPECT_THROW(m0.append(mtx::row{0}), std::logic_error);
 }
 
 TEST_F(TestMatrix, append_column){
@@ -317,6 +324,9 @@ TEST_F(TestMatrix, append_column){
     EXPECT_DOUBLE_EQ(m33[2][3], c3[2]);
 
     EXPECT_THROW(m33.append(mtx::column(4)), std::logic_error);
+
+    mtx::matrix m0(0,0);
+    EXPECT_THROW(m0.append(mtx::column{0}), std::logic_error);
 }
 
 class TestCtMatrix : public ::testing::Test {
@@ -346,6 +356,10 @@ TEST_F(TestCtMatrix, vaule_constr){
     for(size_t i = 0; i < m33_test.rows(); ++i){
         EXPECT_DOUBLE_EQ(m33_test[i][i], 10);
     }
+
+    mtx::matrix_ct<0,0> m00;
+    EXPECT_EQ(m00.cols(), 0);
+    EXPECT_EQ(m00.rows(), 0);
 }
 
 TEST_F(TestCtMatrix, copy_constr){
