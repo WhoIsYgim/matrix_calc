@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "matrix_calc/matrix.h"
 #include "matrix_calc/vector.h"
+#include "matrix_calc/matrix_ct.hpp"
 
 class TestMatrix : public ::testing::Test {
 protected:
