@@ -159,7 +159,7 @@ namespace mtx{
         return out;
     }
 
-    matrix matrix::inverse() {
+    matrix matrix::inverse(double eps) {
         if(rows_ != cols_){
             throw std::logic_error("transposing a non-square matrix");
         }
@@ -191,7 +191,7 @@ namespace mtx{
             E[i][i] = 2;
         }
 
-        double eps = 1.0e-15;
+
         while (std::abs((*this * out).determinant() - 1 ) >= eps){
             matrix prev (out);
             out = *this * prev * (-1) + E;

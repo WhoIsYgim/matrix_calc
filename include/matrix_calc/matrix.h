@@ -23,7 +23,7 @@ namespace mtx {
         vector secondary_diagonal();
 
         matrix transposed();
-        matrix inverse();
+        matrix inverse(double eps  = 1.0e-15);
         double determinant();
 
         void append(const row &rhs);
