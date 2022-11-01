@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: install dependencies 
+        run:  sudo apt-get install libgtest-dev lcov
+      - name: build project
+        run: cd scripts/ && bash build.sh
+        
+      - run: ls -la 
+      
+      - name: upload build
+        uses: actions/upload-artifact@v3
+        with:
+            name: build
+            path: .
+
+            
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: download build
+        uses: actions/download-artifact@v3
+        with:
+          name: build
+
+      - run : ls -la
+
+      - name: install lcov
+        run : sudo apt update && sudo apt install lcov
+
+      - name: run tests
+        run : chmod +x ./build/test/test_matrix_lib && ./build/test/test_matrix_lib
+
+      - name: generate coverage info
+        run : lcov -t "build/test/test_matrix_lib" -o coverage.info -c -d  build/CMakeFiles/matrix_calculator.dir/src/
+
+      - name: filter coverage
+        run : lcov --remove coverage.info '/usr/*' -o coverage_filtered.info
+
+      - name: generate report
+        run : genhtml -o report coverage_filtered.info
+
+      - name: upload report
+        uses: actions/upload-artifact@v3
+        with:
+          name: report
+          path: ./report
