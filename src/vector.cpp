@@ -102,6 +102,31 @@ namespace mtx{
         delete[] buffer;
     }
 
+
+    IVector& IVector::slice(size_t start, size_t stop, int step){
+        if(start >= size_ || stop >= size_){
+            throw std::out_of_range("invalid slice arguments");
+        }
+        if(start == 0 && stop == size_-1 && step == 1){
+            return *this;
+        }
+        size_t new_size = (stop-start)/std::abs(step) + 1;
+        auto temp = new double [new_size];
+
+        size_t pivot_ind = step<0 ? stop : start;
+
+        for (size_t i = 0; i < new_size; ++i ){
+            temp[i] = buffer[pivot_ind + i*step];
+        }
+
+        delete[] buffer;
+        buffer = temp;
+        size_ = new_size;
+        capacity = new_size;
+        return *this;
+    }
+
+
     void IVector::append(double rhs) {
      if(size_+1 > capacity){
          realloc();

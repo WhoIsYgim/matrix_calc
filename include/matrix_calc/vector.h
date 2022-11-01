@@ -12,11 +12,12 @@ namespace mtx {
         IVector(IVector&& other) noexcept;
         virtual ~IVector();
 
+        // slice-methods
+        IVector& slice(size_t start, size_t stop, int step = 1);
         void append(double rhs);
 
         double& at(std::size_t n);
         double& operator[](size_t n) const;
-        IVector& operator+=(double rhs);
         IVector& operator*=(double rhs);
 
         std::size_t size() const;

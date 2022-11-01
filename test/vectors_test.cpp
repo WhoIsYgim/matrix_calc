@@ -85,6 +85,33 @@ TEST_F(TestVectors, move_constr){
     EXPECT_THROW(pivot_r.at(0), std::out_of_range);
 }
 
+TEST_F(TestVectors, slice){
+    mtx::vector vt_3(v3);
+    vt_3.slice(0,2);
+    EXPECT_EQ(vt_3.size(), 3);
+    for(size_t i = 0; i < vt_3.size(); ++i){
+        EXPECT_DOUBLE_EQ(vt_3[i],v3[i]);
+    }
+
+    mtx::vector vt_5{0,1,2,3,4};
+    vt_5.slice(0, 4, 2);
+    for(size_t i = 0; i < vt_5.size(); ++i){
+        EXPECT_DOUBLE_EQ(vt_5[i], 2*i);
+    }
+
+    mtx::row rt_10{0,1,2,3,4,5,6,7,8,9};
+    rt_10.slice(1,9,-3);
+
+    EXPECT_EQ(rt_10.size(), 3);
+    for(size_t i = 0; i < rt_10.size(); ++i){
+        EXPECT_DOUBLE_EQ(rt_10[i], 9-3*i);
+    }
+
+    mtx::column ct_0{};
+    EXPECT_THROW(ct_0.slice(0,0), std::out_of_range);
+}
+
+
 TEST_F(TestVectors, append){
     mtx::vector v_t(v3);
     mtx::column c_t(c3);
